@@ -15,7 +15,6 @@
 """
 
 import datetime
-from tokenize import Double
 from typing import List
 
 
@@ -91,9 +90,9 @@ class Leg:
         self.destination = destination
 
     @property
-    def passengers(self):
+    def passengers(self) -> list["Passenger"]: 
         """List of passengers on leg"""
-        passengers = []
+        passengers: list = []
 
         for od in self.service.ods:
             for leg in od.legs:
@@ -123,14 +122,20 @@ class OD:
 
         return [self.service.legs[i] for i in range(itinerary.index(self.origin), itinerary.index(self.destination))]
 
-    def history(self):
-        """generates a report about sales made each day for given OD"""
-        history = {}
+    def history(self) -> list[list[float, int, float]]:
+        """generates a report containing sales made each day for given OD
+
+        The report is a list where each entry is in the form [sale_day_x, cumulative_number_booking, cumulative revenue]
+        """
+        history: dict = {}
         culmulative_number_bookings: int = 0
         cumulative_revenue: float = 0
+
         for passenger in self.passengers:
+
             culmulative_number_bookings += 1
             cumulative_revenue += passenger.price
+
             history.setdefault(passenger.sale_day_x, [0, 0])
             history[passenger.sale_day_x][0] = culmulative_number_bookings
             history[passenger.sale_day_x][1] = cumulative_revenue
