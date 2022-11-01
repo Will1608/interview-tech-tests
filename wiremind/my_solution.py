@@ -15,6 +15,7 @@
 """
 
 import datetime
+from tokenize import Double
 from typing import List
 
 
@@ -61,9 +62,15 @@ class Service:
                 self.ods.append(OD(self, itinerary[origin_idx], itinerary[destination_idx]))
 
     def load_passenger_manifest(self, passengers: List["Passenger"]) -> None:
+        """Fills od passenger bookings from passenger manifest"""
+
         for passenger in passengers:
-            print(OD(self, passenger.origin, passenger.destination))
-            print(self.ods[0])
+
+            for od in self.ods:
+
+                if(od.origin == passenger.origin and od.destination == passenger.destination):
+
+                    od.passengers.append(passenger)
 
 class Station:
     """A station is where a service can stop to let passengers board or disembark."""
@@ -82,6 +89,19 @@ class Leg:
         self.service = service
         self.origin = origin
         self.destination = destination
+
+    @property
+    def passengers(self):
+        """List of passengers on leg"""
+        passengers = []
+
+        for od in self.service.ods:
+            for leg in od.legs:
+                if(leg == self):
+                    passengers.extend(od.passengers)
+        
+        return passengers
+        
 
 
 class OD:
@@ -103,6 +123,19 @@ class OD:
 
         return [self.service.legs[i] for i in range(itinerary.index(self.origin), itinerary.index(self.destination))]
 
+    def history(self):
+        """generates a report about sales made each day for given OD"""
+        history = {}
+        culmulative_number_bookings: int = 0
+        cumulative_revenue: float = 0
+        for passenger in self.passengers:
+            culmulative_number_bookings += 1
+            cumulative_revenue += passenger.price
+            history.setdefault(passenger.sale_day_x, [0, 0])
+            history[passenger.sale_day_x][0] = culmulative_number_bookings
+            history[passenger.sale_day_x][1] = cumulative_revenue
+        
+        return [[sale_day_x, sale_info[0], sale_info[1]] for sale_day_x, sale_info in history.items()]
 
 class Passenger:
     """A passenger that has a booking on a seat for a particular origin-destination."""
@@ -179,18 +212,18 @@ assert len(od_lpd_msc.passengers) == 0
 
 # 5. Write a property named `passengers` in `Leg` class that returns passengers occupying a seat on this leg.
 
-# assert len(service.legs[0].passengers) == 5
-# assert len(service.legs[1].passengers) == 1
+assert len(service.legs[0].passengers) == 5
+assert len(service.legs[1].passengers) == 1
 
 # 6. We want to generate a report about sales made each day, write a `history()` method in `OD` class that returns a
 # list of data point, each data point is a three elements array: [day_x, cumulative number of bookings, cumulative
 # revenue].
 
-# history = od_ply_lpd.history()
-# assert len(history) == 3
-# assert history[0] == [-30, 1, 20]
-# assert history[1] == [-25, 2, 50]
-# assert history[2] == [-20, 4, 130]
+history = od_ply_lpd.history()
+assert len(history) == 3
+assert history[0] == [-30, 1, 20]
+assert history[1] == [-25, 2, 50]
+assert history[2] == [-20, 4, 130]
 
 # 7. In the final solution, we have a demand matrix estimated using machine learning that gives us the estimated demand for any day_x and price 
 # The goal of this question is to write an algorithm that find the optimal path to maximize the revenue through this matrix
