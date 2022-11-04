@@ -16,6 +16,7 @@
 
 import datetime
 from typing import List
+from xml.etree.ElementInclude import DEFAULT_MAX_INCLUSION_DEPTH
 
 
 class Service:
@@ -90,9 +91,9 @@ class Leg:
         self.destination = destination
 
     @property
-    def passengers(self) -> list["Passenger"]: 
+    def passengers(self) -> List["Passenger"]: 
         """List of passengers on leg"""
-        passengers: list = []
+        passengers: List = []
 
         for od in self.service.ods:
             for leg in od.legs:
@@ -122,7 +123,7 @@ class OD:
 
         return [self.service.legs[i] for i in range(itinerary.index(self.origin), itinerary.index(self.destination))]
 
-    def history(self) -> list[list[float, int, float]]:
+    def history(self) -> List[List[float, int, float]]:
         """generates a report containing sales made each day for given OD
 
         The report is a list where each entry is in the form [sale_day_x, cumulative_number_booking, cumulative revenue]
@@ -151,6 +152,17 @@ class Passenger:
         self.sale_day_x = sale_day_x
         self.price = price
 
+def max_path_finder(demand_matrix: List[List[int]]):
+    root_node = (0,0)
+    target_node = (len(demand_matrix), len(demand_matrix[0]))
+    total_nodes = target_node[0] * target_node[1]
+
+    max_path = []
+    max_value = 0
+    for node in range(total_nodes):
+       pass
+
+    pass
 
 # Let's create a service to represent a train going from Paris to Marseille with Lyon as intermediate stop. This service
 # has two legs and sells three ODs.
@@ -238,11 +250,11 @@ assert history[2] == [-20, 4, 130]
 # The function that solves the problem should looks something like this
 # matrix = 1 1 8 
 #          3 2 1
-# assert max_path_finder([[1, 1, 8], [3, 2, 1]]) == 11, [(0,0) (0,1) (0,2) (1,2)]
+assert max_path_finder([[1, 1, 8], [3, 2, 1]]) == 11, [(0,0) (0,1) (0,2) (1,2)]
 # 
 # You code should pass all the following asserts
-# assert max_path_finder([[1, 2, 3], [3, 4, 5]]) == (13, [(0, 0), (1, 0), (1, 1), (1, 2)])
-# assert max_path_finder([[1, 2, 25], [3, 4, 5]]) == (33, [(0, 0), (0, 1), (0, 2), (1, 2)])
-# assert max_path_finder([[1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0]]) == (5, [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (4, 1), (4, 2)])
-# assert max_path_finder([[1, 0, 5], [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0]]) == (6, [(0, 0), (0, 1), (0, 2), (1, 2), (2, 2), (3, 2), (4, 2)])
-# assert max_path_finder([[1, 0, 5], [1, 0, 0], [1, 10, 1], [1, 0, 1], [1, 0, 0]]) == (15, [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (3, 2), (4, 2)])
+assert max_path_finder([[1, 2, 3], [3, 4, 5]]) == (13, [(0, 0), (1, 0), (1, 1), (1, 2)])
+assert max_path_finder([[1, 2, 25], [3, 4, 5]]) == (33, [(0, 0), (0, 1), (0, 2), (1, 2)])
+assert max_path_finder([[1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0]]) == (5, [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (4, 1), (4, 2)])
+assert max_path_finder([[1, 0, 5], [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0]]) == (6, [(0, 0), (0, 1), (0, 2), (1, 2), (2, 2), (3, 2), (4, 2)])
+assert max_path_finder([[1, 0, 5], [1, 0, 0], [1, 10, 1], [1, 0, 1], [1, 0, 0]]) == (15, [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (3, 2), (4, 2)])
